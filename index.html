@@ -2,8 +2,17 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Beautify JSON</title>
+    <title>JSON Formatter</title>
     <style>
+        .loading-mask {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: #1e1e1e;
+            z-index: 1;
+        }
         .container {
             position: fixed;
             left: 0;
@@ -11,32 +20,13 @@
             right: 0;
             bottom: 0;
         }
-        .source {
+        .editor {
             position: absolute;
             left: 0;
             top: 0;
             right: 0;
             bottom: 0;
-            border-right: 1px solid #ececec;
-        }
-        .source-text {
-            position: absolute;
-            width: 100%;
-            display: block;
-            left: 0;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            box-sizing: border-box;
-            border: 1px solid transparent;
-            padding: 1em;
-            outline: none;
-            resize: none;
-            font-size: 13px;
-            font-family: Monaco, Menlo, Consolas, monospace;
-        }
-        .source-text:focus {
-            background-color: #fafafa;
+            background-color: #1e1e1e;
         }
         .header {
             height: 50px;
@@ -45,6 +35,22 @@
             right: 0;
             top: 0;
             background-color: #000;
+        }
+        .heading {
+            padding: 0 1em;
+            float: left;
+        }
+        .heading h1 {
+            margin: 0;
+            padding: 0;
+            font-size: 18px;
+            color: #eee;
+            font-weight: normal;
+            line-height: 50px;
+            font-family: serif;
+        }
+        .controls {
+            float: right;
         }
         .tab-size-selector {
             height: 50px;
@@ -57,7 +63,7 @@
             height: 50px;
             line-height: 50px;
             padding: 0 1em;
-            float: right;
+            float: left;
         }
         .beautify-button button {
             display: inline-block;
@@ -79,70 +85,35 @@
     </style>
 </head>
 <body>
+    <div class="loading-mask"></div>
     <div class="container">
-        <div class="source">
-            <textarea id="sourceTextarea" class="source-text" placeholder="Source code"></textarea>
-        </div>
+        <div id="editor" class="editor"></div>
     </div>
     <div class="header">
-        <div class="tab-size-selector">
-            <label for="tabSize">Tab size:</label>
-            <select id="tabSize" name="tabSize">
-                <option value="2">2</option>
-                <option value="4">4</option>
-            </select>
+        <div class="heading">
+            <h1>JSON Formatter</h1>
         </div>
-        <div class="beautify-button">
-            <button id="btnBeautify" type="button">Beautify JSON</button>
+        <div class="controls">
+            <div class="tab-size-selector">
+                <label for="tabSize">Tab size:</label>
+                <select id="tabSize" name="tabSize">
+                    <option value="2">2</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
+            <div class="beautify-button">
+                <button type="button">Beautify JSON</button>
+            </div>
         </div>
     </div>
     <script>
-        (function () {
-            var sourceTextarea = document.getElementById('sourceTextarea');
-            var btnBeautify = document.getElementById('btnBeautify');
-            var tabSizeSelect = document.getElementById('tabSize');
-
-            function cacheSource() {
-                localStorage.setItem('utils.json.source', sourceTextarea.value);
+        var requirejs = {
+            baseUrl: 'src/scripts/',
+            paths: {
+                vs: 'monaco-editor/min/vs'
             }
-
-            sourceTextarea.addEventListener('input', function () {
-                cacheSource();
-            });
-
-            tabSizeSelect.addEventListener('change', function () {
-                localStorage.setItem('utils.json.tabSize', tabSizeSelect.value);
-            });
-
-            btnBeautify.addEventListener('click', function () {
-                var data = null;
-                var tabSize = +tabSizeSelect.value;
-                var source = sourceTextarea.value.replace(/^\s+|\s+$/g, '');
-
-                if (source !== '') {
-                    try {
-                        data = JSON.parse(source);
-                    } catch (err) {
-                        console.error(err);
-                        alert(err);
-                        return;
-                    }
-                    sourceTextarea.value = JSON.stringify(data, null, tabSize);
-                    cacheSource();
-                }
-            }, false);
-
-            var savedTabSize = localStorage.getItem('utils.json.tabSize');
-            var savedSource = localStorage.getItem('utils.json.source');
-
-            if (savedTabSize) {
-                tabSizeSelect.value = savedTabSize;
-            }
-
-            if (savedSource) {
-                sourceTextarea.value = savedSource;
-            }
-        })();
+        };
     </script>
+    <script src="./src/scripts/require.js" data-main="main"></script>
 </body>
 </html>
